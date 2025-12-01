@@ -39,7 +39,10 @@ export function StatCard({
 
   return (
     <Card
-      className={cn("p-3 sm:p-4 border-border/50 hover:border-border/80", className)}
+      className={cn(
+        "p-3 sm:p-4 border-border/50 hover:border-border/80",
+        className
+      )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1 sm:space-y-1.5 min-w-0">
@@ -59,8 +62,12 @@ export function StatCard({
                   isNeutral && "text-muted-foreground/70"
                 )}
               >
-                {isPositive && <ArrowUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
-                {isNegative && <ArrowDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
+                {isPositive && (
+                  <ArrowUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                )}
+                {isNegative && (
+                  <ArrowDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                )}
                 {isNeutral && <Minus className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
                 {Math.abs(change).toFixed(1)}%
               </span>

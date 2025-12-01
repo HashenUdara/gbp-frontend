@@ -78,7 +78,12 @@ function QnAStats({
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-card border border-border rounded-xl">
       {stats.map((stat, index) => (
         <React.Fragment key={stat.key}>
-          {index > 0 && <Separator orientation="vertical" className="hidden sm:block h-12" />}
+          {index > 0 && (
+            <Separator
+              orientation="vertical"
+              className="hidden sm:block h-12"
+            />
+          )}
           {index > 0 && <Separator className="sm:hidden" />}
           <button
             onClick={() => onFilterChange(stat.key)}
@@ -90,7 +95,9 @@ function QnAStats({
             <p className={cn("text-xl sm:text-2xl font-semibold", stat.color)}>
               {stat.value}
             </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              {stat.label}
+            </p>
           </button>
         </React.Fragment>
       ))}
@@ -307,12 +314,17 @@ export function QnATab({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold">Questions & Answers</h2>
+          <h2 className="text-base sm:text-lg font-semibold">
+            Questions & Answers
+          </h2>
           <p className="text-xs sm:text-sm text-muted-foreground">
             Answer customer questions to help them learn about your business
           </p>
         </div>
-        <Button className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm w-fit" onClick={onAddQuestion}>
+        <Button
+          className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm w-fit"
+          onClick={onAddQuestion}
+        >
           <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Add Q&A
         </Button>

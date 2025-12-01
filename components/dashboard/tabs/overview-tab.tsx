@@ -100,7 +100,7 @@ interface StarRatingProps {
 
 function StarRating({ rating, maxRating = 5, size = "sm" }: StarRatingProps) {
   const sizeClass = size === "sm" ? "h-3 w-3" : "h-4 w-4";
-  
+
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: maxRating }).map((_, i) => (
@@ -155,7 +155,9 @@ function ReviewItem({ review, onReply }: ReviewItemProps) {
         {review.reply && (
           <div className="mt-2 pl-3 border-l-2 border-border/40">
             <p className="text-[11px] text-muted-foreground/70 line-clamp-1">
-              <span className="font-medium text-foreground/70">Your reply:</span>{" "}
+              <span className="font-medium text-foreground/70">
+                Your reply:
+              </span>{" "}
               {review.reply}
             </p>
           </div>
@@ -182,7 +184,11 @@ interface RecentReviewsCardProps {
   onReply?: (review: Review) => void;
 }
 
-function RecentReviewsCard({ reviews, onViewAll, onReply }: RecentReviewsCardProps) {
+function RecentReviewsCard({
+  reviews,
+  onViewAll,
+  onReply,
+}: RecentReviewsCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -270,7 +276,11 @@ interface RecentPostsCardProps {
   onPostClick?: (post: Post) => void;
 }
 
-function RecentPostsCard({ posts, onViewAll, onPostClick }: RecentPostsCardProps) {
+function RecentPostsCard({
+  posts,
+  onViewAll,
+  onPostClick,
+}: RecentPostsCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -322,7 +332,8 @@ function QuickInfoCard({ profile }: QuickInfoCardProps) {
             <>
               {profile.address.street}
               <br />
-              {profile.address.city}, {profile.address.state} {profile.address.zip}
+              {profile.address.city}, {profile.address.state}{" "}
+              {profile.address.zip}
             </>
           }
         />
@@ -357,7 +368,10 @@ interface ProfileCompletionCardProps {
   items: { item: string; completed: boolean }[];
 }
 
-function ProfileCompletionCard({ completion, items }: ProfileCompletionCardProps) {
+function ProfileCompletionCard({
+  completion,
+  items,
+}: ProfileCompletionCardProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -391,7 +405,12 @@ function ProfileCompletionCard({ completion, items }: ProfileCompletionCardProps
                 {item.item}
               </span>
               {!item.completed && (
-                <StatusBadge status="warning" variant="subtle" size="sm" className="ml-auto">
+                <StatusBadge
+                  status="warning"
+                  variant="subtle"
+                  size="sm"
+                  className="ml-auto"
+                >
                   To do
                 </StatusBadge>
               )}

@@ -367,7 +367,10 @@ export function PostsTab({
             Share updates, offers, and events with your customers
           </p>
         </div>
-        <Button className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm w-fit" onClick={onCreate}>
+        <Button
+          className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm w-fit"
+          onClick={onCreate}
+        >
           <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Create Post
         </Button>

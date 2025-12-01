@@ -50,7 +50,9 @@ export default function ProfileLayout({
           </div>
         </header>
         <main className="flex-1 overflow-auto bg-muted/30">
-          <div className="p-3 sm:p-4 md:p-5 max-w-[1600px] mx-auto">{children}</div>
+          <div className="p-3 sm:p-4 md:p-5 max-w-[1600px] mx-auto">
+            {children}
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>

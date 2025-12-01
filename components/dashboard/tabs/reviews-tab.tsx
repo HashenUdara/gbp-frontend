@@ -337,7 +337,9 @@ function ReviewCard({
             <div className="flex items-start justify-between gap-2 sm:gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-sm sm:text-base truncate">{review.author}</span>
+                  <span className="font-medium text-sm sm:text-base truncate">
+                    {review.author}
+                  </span>
                   {review.isNew && (
                     <StatusBadge status="info" variant="subtle" size="sm">
                       New

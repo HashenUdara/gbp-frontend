@@ -179,7 +179,9 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
           {/* Rating */}
           <div className="flex items-center gap-1 sm:gap-1.5">
             <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-amber-400 text-amber-400" />
-            <span className="font-semibold text-[14px] sm:text-[15px]">{profile.rating}</span>
+            <span className="font-semibold text-[14px] sm:text-[15px]">
+              {profile.rating}
+            </span>
             <span className="text-[12px] sm:text-[13px] text-muted-foreground/70">
               ({profile.totalReviews})
             </span>

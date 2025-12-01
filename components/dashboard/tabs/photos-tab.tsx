@@ -335,7 +335,10 @@ export function PhotosTab({
             </SelectContent>
           </Select>
           <GridToggle gridSize={gridSize} onChange={setGridSize} />
-          <Button className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm ml-auto sm:ml-0" onClick={onUpload}>
+          <Button
+            className="gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm ml-auto sm:ml-0"
+            onClick={onUpload}
+          >
             <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden xs:inline">Upload Photos</span>
             <span className="xs:hidden">Upload</span>
