@@ -11,6 +11,7 @@ import {
   Settings,
   Plus,
   ChevronDown,
+  Link2,
 } from "lucide-react";
 
 import { NavUser } from "@/components/nav-user";
@@ -80,6 +81,11 @@ const mainNav = [
     icon: MessageSquare,
     href: "/profile/reviews",
     badge: "3",
+  },
+  {
+    title: "Review Link",
+    icon: Link2,
+    href: "/review-link",
   },
   {
     title: "Photos",
