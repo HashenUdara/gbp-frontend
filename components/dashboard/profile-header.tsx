@@ -46,9 +46,9 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
   const todayHours = profile.openingHours.find((h) => h.day === today);
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl overflow-hidden">
+    <div className="bg-card border border-border/50 rounded-xl sm:rounded-2xl overflow-hidden">
       {/* Cover Photo */}
-      <div className="relative h-44 sm:h-52 md:h-56 bg-muted">
+      <div className="relative h-32 sm:h-44 md:h-52 bg-muted">
         <img
           src={coverImage || defaultCover}
           alt="Cover"
@@ -61,23 +61,23 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
         <Button
           variant="secondary"
           size="sm"
-          className="absolute bottom-3 right-3 gap-1.5 bg-white/95 hover:bg-white text-foreground text-xs h-8 px-3 rounded-lg backdrop-blur-sm border-0"
+          className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 gap-1.5 bg-white/95 hover:bg-white text-foreground text-xs h-7 sm:h-8 px-2 sm:px-3 rounded-lg backdrop-blur-sm border-0"
         >
-          <Camera className="h-3.5 w-3.5" />
-          Edit Cover
+          <Camera className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          <span className="hidden sm:inline">Edit Cover</span>
         </Button>
       </div>
 
       {/* Profile Info Section */}
-      <div className="relative px-5 pb-5">
+      <div className="relative px-3 sm:px-5 pb-4 sm:pb-5">
         {/* Avatar - positioned to overlap cover */}
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-14 sm:-mt-10">
-          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl border-[3px] border-card ring-0">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4 -mt-10 sm:-mt-10">
+          <Avatar className="h-20 w-20 sm:h-24 md:h-28 sm:w-24 md:w-28 rounded-xl sm:rounded-2xl border-[3px] border-card ring-0">
             <AvatarImage
               src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}&backgroundColor=6366f1`}
               alt={profile.name}
             />
-            <AvatarFallback className="rounded-2xl bg-primary text-primary-foreground text-2xl font-medium">
+            <AvatarFallback className="rounded-xl sm:rounded-2xl bg-primary text-primary-foreground text-xl sm:text-2xl font-medium">
               {profile.name
                 .split(" ")
                 .map((n) => n[0])
@@ -86,23 +86,23 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
           </Avatar>
 
           {/* Name and Actions Row */}
-          <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 sm:pt-0 sm:pb-1">
+          <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pt-1 sm:pt-0 sm:pb-1">
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-foreground">
                   {profile.name}
                 </h1>
                 {profile.isVerified && (
                   <Badge
                     variant="secondary"
-                    className="bg-blue-50/80 text-blue-600 dark:bg-blue-950 dark:text-blue-400 gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md"
+                    className="bg-blue-50/80 text-blue-600 dark:bg-blue-950 dark:text-blue-400 gap-1 text-[10px] sm:text-[11px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md"
                   >
-                    <CheckCircle2 className="h-3 w-3" />
+                    <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     Verified
                   </Badge>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[13px] text-muted-foreground/80">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 sm:mt-1 text-[12px] sm:text-[13px] text-muted-foreground/80">
                 <span className="font-medium text-foreground/70">
                   {profile.category}
                 </span>
@@ -115,19 +115,19 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5 h-8 text-[13px] px-3 rounded-lg"
+                className="gap-1 sm:gap-1.5 h-7 sm:h-8 text-[12px] sm:text-[13px] px-2 sm:px-3 rounded-lg"
               >
-                <Pencil className="h-3.5 w-3.5" />
+                <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 Edit
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5 h-8 text-[13px] px-3 rounded-lg"
+                className="gap-1 sm:gap-1.5 h-7 sm:h-8 text-[12px] sm:text-[13px] px-2 sm:px-3 rounded-lg hidden xs:flex"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
                 View
@@ -137,7 +137,7 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-lg text-muted-foreground/70 hover:text-foreground"
+                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-muted-foreground/70 hover:text-foreground"
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
@@ -146,6 +146,10 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
                   align="end"
                   className="w-44 rounded-xl border-border/50"
                 >
+                  <DropdownMenuItem className="gap-2 text-[13px] rounded-lg xs:hidden">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    View on Google
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="gap-2 text-[13px] rounded-lg">
                     <Share2 className="h-3.5 w-3.5" />
                     Share Profile
@@ -171,12 +175,12 @@ export function ProfileHeader({ profile, coverImage }: ProfileHeaderProps) {
         </div>
 
         {/* Info Row - Rating, Hours, Status */}
-        <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-border/40">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/40">
           {/* Rating */}
-          <div className="flex items-center gap-1.5">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <span className="font-semibold text-[15px]">{profile.rating}</span>
-            <span className="text-[13px] text-muted-foreground/70">
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-amber-400 text-amber-400" />
+            <span className="font-semibold text-[14px] sm:text-[15px]">{profile.rating}</span>
+            <span className="text-[12px] sm:text-[13px] text-muted-foreground/70">
               ({profile.totalReviews})
             </span>
           </div>
