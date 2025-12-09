@@ -124,9 +124,9 @@ export function ReviewLinkBuilder() {
       <div className="flex">
         <ReviewLinkSidebar />
         <main className="flex-1 lg:pl-64">
-          <div className="h-screen flex">
+          <div className="min-h-screen flex flex-col lg:flex-row">
             {/* Left Panel - Settings Wizard */}
-            <div className="w-[520px] flex flex-col border-r border-white/[0.06]">
+            <div className="w-full lg:w-[520px] flex flex-col border-b lg:border-b-0 lg:border-r border-white/[0.06]">
               <ReviewLinkSettings
                 config={config}
                 updateConfig={updateConfig}
@@ -138,7 +138,7 @@ export function ReviewLinkBuilder() {
 
             {/* Right Panel - Preview */}
             <div className="flex-1 flex flex-col bg-[#0A0A0B]">
-              <div className="px-8 py-6 border-b border-white/[0.06] flex items-center justify-between">
+              <div className="px-4 lg:px-8 py-4 lg:py-6 border-b border-white/[0.06] flex items-center justify-between">
                 <span className="text-sm text-zinc-500">Preview</span>
                 {config.status === "draft" && (
                   <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md">
