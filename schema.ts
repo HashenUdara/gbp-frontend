@@ -180,3 +180,6 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
   processedAt: timestamp("processed_at").defaultNow().notNull(),
   data: text("data"), // JSON string of event data
 });
+
+// Re-export Review Links schema
+export * from "./lib/db/review-links-schema";
