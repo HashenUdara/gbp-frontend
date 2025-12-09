@@ -74,7 +74,7 @@ export function ReviewLinkSettings({
   return (
     <div className="h-full flex flex-col">
       {/* Step Indicator */}
-      <div className="px-4 py-6 lg:px-8 lg:py-8 border-b border-white/[0.06]">
+      <div className="px-8 py-8 border-b border-white/[0.06]">
         <div className="flex items-center justify-between max-w-xl">
           {STEPS.map((step, index) => (
             <div key={step.id} className="flex items-center">
@@ -109,9 +109,9 @@ export function ReviewLinkSettings({
       </div>
 
       {/* Step Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
-        <div className="mb-6 lg:mb-8">
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+      <div className="flex-1 overflow-y-auto px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
             {STEPS[currentStep - 1].title}
           </h2>
           <p className="text-zinc-500 text-base">
