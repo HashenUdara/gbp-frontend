@@ -41,7 +41,6 @@ export interface ReviewLinkConfig {
   // Top 5 Features
   logoUrl: string;
   coverUrl: string;
-  thankYouRedirectUrl: string;
   notifyEmail: string;
   notifyOnNegative: boolean;
 }
@@ -86,7 +85,6 @@ const defaultConfig: ReviewLinkConfig = {
   // Top 5 Features
   logoUrl: "",
   coverUrl: "",
-  thankYouRedirectUrl: "",
   notifyEmail: "",
   notifyOnNegative: false,
 };

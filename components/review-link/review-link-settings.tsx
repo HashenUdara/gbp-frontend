@@ -305,24 +305,6 @@ export function ReviewLinkSettings({
                   Paste your Google review link here
                 </p>
               </div>
-
-              <div>
-                <Label className="text-sm text-zinc-400 mb-2 block">
-                  Thank You Redirect URL (Optional)
-                </Label>
-                <Input
-                  value={config.thankYouRedirectUrl}
-                  onChange={(e) =>
-                    updateConfig({ thankYouRedirectUrl: e.target.value })
-                  }
-                  className="h-12 border border-white/[0.08] bg-transparent text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-emerald-500/30 rounded-xl"
-                  placeholder="https://yoursite.com/thank-you"
-                />
-                <p className="text-xs text-zinc-500 mt-2">
-                  Redirect customers here after they leave a review (e.g.,
-                  coupon page)
-                </p>
-              </div>
             </div>
 
             {/* Negative Response */}
