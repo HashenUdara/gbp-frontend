@@ -307,16 +307,18 @@ export function ContactSheet({
 
             {/* Timeline */}
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Activity</h3>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Activity
+                </h3>
                 <span className="text-xs text-muted-foreground">
                   {contact.timeline.length} events
                 </span>
               </div>
 
-              <div className="relative">
-                {/* Vertical line */}
-                <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+              <div className="relative pl-3">
+                {/* Vertical line - positioned to go through icon centers */}
+                <div className="absolute left-[23px] top-0 bottom-0 w-px bg-border/40" />
 
                 <div className="space-y-0">
                   {sortedTimeline.map((event, index) => {
@@ -328,16 +330,21 @@ export function ContactSheet({
                     const isFailed =
                       event.type === "sms_failed" ||
                       event.type === "unsubscribed";
+                    const isFirst = index === 0;
+                    const isLast = index === sortedTimeline.length - 1;
 
                     return (
-                      <div key={event.id} className="relative flex gap-4 py-3">
+                      <div
+                        key={event.id}
+                        className="relative flex gap-4 py-4 hover:bg-muted/20 rounded-lg transition-colors -ml-3 pl-3"
+                      >
                         {/* Icon */}
                         <div
                           className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background border ${
                             isSuccess
-                              ? "border-emerald-500/50"
+                              ? "border-emerald-500/60"
                               : isFailed
-                              ? "border-rose-500/50"
+                              ? "border-rose-500/60"
                               : "border-border"
                           }`}
                         >
@@ -345,20 +352,22 @@ export function ContactSheet({
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 min-w-0 -mt-0.5">
-                          <div className="flex items-baseline justify-between gap-2">
-                            <h4 className="text-sm font-medium">
-                              {event.title}
-                            </h4>
-                            <time className="text-[11px] text-muted-foreground shrink-0">
+                        <div className="flex-1 min-w-0 pt-0.5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h4 className="text-sm font-medium leading-tight">
+                                {event.title}
+                              </h4>
+                              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                                {event.description}
+                              </p>
+                            </div>
+                            <time className="text-[10px] text-muted-foreground shrink-0 pt-0.5">
                               {formatDistanceToNow(event.timestamp, {
                                 addSuffix: true,
                               })}
                             </time>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {event.description}
-                          </p>
 
                           {/* Star rating for reviews */}
                           {event.metadata?.rating && (
@@ -366,7 +375,7 @@ export function ContactSheet({
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-3.5 w-3.5 ${
+                                  className={`h-4 w-4 ${
                                     i < (event.metadata?.rating as number)
                                       ? "fill-amber-400 text-amber-400"
                                       : "fill-muted text-muted"
