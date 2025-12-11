@@ -191,6 +191,7 @@ export default function ContactsPage() {
           onOpenChange={setSheetOpen}
           contact={viewingContact}
           onEdit={handleEditContact}
+          onDelete={handleDeleteContact}
         />
       </SidebarInset>
     </SidebarProvider>

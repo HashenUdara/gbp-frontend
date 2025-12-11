@@ -22,6 +22,8 @@ import {
   Copy,
   Check,
   ChevronRight,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -97,6 +99,7 @@ interface ContactSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (contact: Contact) => void;
+  onDelete?: (contact: Contact) => void;
 }
 
 export function ContactSheet({
@@ -104,6 +107,7 @@ export function ContactSheet({
   open,
   onOpenChange,
   onEdit,
+  onDelete,
 }: ContactSheetProps) {
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
 
@@ -137,11 +141,11 @@ export function ContactSheet({
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-4">
             <div className="flex items-start gap-4">
-              {/* Avatar - clean, minimal */}
+              {/* Avatar */}
               <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                 style={
                   {
                     "--avatar-hue": hue,
@@ -155,30 +159,35 @@ export function ContactSheet({
                 {initials}
               </div>
 
-              <div className="flex-1 min-w-0 pt-1">
-                <h2 className="text-xl font-semibold tracking-tight">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold tracking-tight">
                   {fullName}
                 </h2>
-                <div className="flex items-center gap-3 mt-1.5">
-                  {/* Status - just text with dot */}
-                  <span className="inline-flex items-center gap-1.5 text-sm">
-                    <span
-                      className={`h-2 w-2 rounded-full ${statusConfig.dot}`}
-                    />
-                    <span className={statusConfig.text}>
-                      {statusOption?.label}
-                    </span>
-                  </span>
-
-                  {contact.reviewCount > 0 && (
-                    <>
-                      <span className="text-muted-foreground/40">·</span>
-                      <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                        {contact.reviewCount}
-                      </span>
-                    </>
-                  )}
+                <div className="flex items-center gap-2 mt-1">
+                  {/* Inline action buttons */}
+                  <div className="flex items-center gap-2">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(contact)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-border/60 hover:bg-muted/50 transition-colors"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Edit
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        onClick={() => {
+                          onDelete(contact);
+                          onOpenChange(false);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-border/60 text-destructive hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
