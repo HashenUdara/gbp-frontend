@@ -186,99 +186,115 @@ export function ContactSheet({
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-6 pb-6">
-            {/* Contact Details */}
-            <div className="mt-6 space-y-1">
-              {/* Email row */}
-              <button
-                onClick={() => copyToClipboard(contact.email, "email")}
-                className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-lg transition-colors group -mx-1"
-              >
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm">{contact.email}</p>
+            {/* Contact Section */}
+            <div className="mt-5">
+              <h3 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3">
+                Contact
+              </h3>
+              <div className="space-y-2">
+                {/* Email */}
+                <button
+                  onClick={() => copyToClipboard(contact.email, "email")}
+                  className="w-full group"
+                >
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 hover:border-border hover:bg-muted/30 transition-all">
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{contact.email}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedField === "email" ? (
+                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                          <Check className="h-3 w-3" />
+                        </span>
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </span>
                   </div>
-                </div>
-                <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                  {copiedField === "email" ? (
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <Check className="h-3 w-3" /> Copied
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1">
-                      <Copy className="h-3 w-3" /> Copy
-                    </span>
-                  )}
-                </span>
-              </button>
+                </button>
 
-              {/* Phone row */}
-              <button
-                onClick={() => copyToClipboard(contact.telephone, "phone")}
-                className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-lg transition-colors group -mx-1"
-              >
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground">Phone</p>
-                    <p className="text-sm">{contact.telephone}</p>
+                {/* Phone */}
+                <button
+                  onClick={() => copyToClipboard(contact.telephone, "phone")}
+                  className="w-full group"
+                >
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 hover:border-border hover:bg-muted/30 transition-all">
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{contact.telephone}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedField === "phone" ? (
+                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                          <Check className="h-3 w-3" />
+                        </span>
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </span>
                   </div>
-                </div>
-                <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                  {copiedField === "phone" ? (
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <Check className="h-3 w-3" /> Copied
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1">
-                      <Copy className="h-3 w-3" /> Copy
-                    </span>
-                  )}
-                </span>
-              </button>
-
-              {/* Source row */}
-              <div className="flex items-center gap-3 py-3 px-1">
-                {sourceOption?.icon && (
-                  <sourceOption.icon className="h-4 w-4 text-muted-foreground" />
-                )}
-                <div>
-                  <p className="text-xs text-muted-foreground">Source</p>
-                  <p className="text-sm">{sourceOption?.label}</p>
-                </div>
+                </button>
               </div>
+            </div>
 
-              {/* Added date row */}
-              <div className="flex items-center gap-3 py-3 px-1">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Added</p>
-                  <p className="text-sm">
-                    {format(contact.addedDate, "MMM d, yyyy")}
+            {/* Details Section */}
+            <div className="mt-5">
+              <h3 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3">
+                Details
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {/* Source */}
+                <div className="p-3 rounded-lg border border-border/60">
+                  <p className="text-[11px] text-muted-foreground mb-1">
+                    Source
                   </p>
-                </div>
-              </div>
-
-              {contact.lastActivity && (
-                <div className="flex items-center gap-3 py-3 px-1">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">
-                      Last Activity
-                    </p>
-                    <p className="text-sm">
-                      {formatDistanceToNow(contact.lastActivity, {
-                        addSuffix: true,
-                      })}
-                    </p>
+                  <div className="flex items-center gap-2">
+                    {sourceOption?.icon && (
+                      <sourceOption.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {sourceOption?.label}
+                    </span>
                   </div>
                 </div>
-              )}
+
+                {/* Added */}
+                <div className="p-3 rounded-lg border border-border/60">
+                  <p className="text-[11px] text-muted-foreground mb-1">
+                    Added
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-sm font-medium">
+                      {format(contact.addedDate, "MMM d, yyyy")}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Last Activity - spans full width */}
+                {contact.lastActivity && (
+                  <div className="col-span-2 p-3 rounded-lg border border-border/60">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-[11px] text-muted-foreground">
+                          Last Activity
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium">
+                        {formatDistanceToNow(contact.lastActivity, {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Divider */}
-            <div className="my-6 h-px bg-border" />
+            <div className="my-5 h-px bg-border/60" />
 
             {/* Timeline */}
             <div>
