@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertCircleIcon,
   DownloadIcon,
   FileSpreadsheetIcon,
+  Loader2Icon,
   PaperclipIcon,
   UploadIcon,
   XIcon,
@@ -13,16 +14,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatBytes, useFileUpload } from "@/hooks/use-file-upload";
 import { useImport } from "./import-context";
-import { parseCSV, downloadTemplate } from "./csv-utils";
+import { parseCSVFile, downloadTemplate, ParseCSVResult } from "./csv-utils";
 
 export default function ImportUploadPage() {
   const router = useRouter();
   const { setRows, setFileName, setStep } = useImport();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [parseErrors, setParseErrors] = useState<string[]>([]);
 
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = 10 * 1024 * 1024; // 10MB - increased for larger imports
 
   const [
-    { files, isDragging, errors },
+    { files, isDragging, errors: uploadErrors },
     {
       handleDragEnter,
       handleDragLeave,
@@ -39,22 +42,57 @@ export default function ImportUploadPage() {
 
   const file = files[0];
 
+  // Combined errors from upload and parsing
+  const allErrors = [...uploadErrors, ...parseErrors];
+
   const handleContinue = useCallback(async () => {
-    if (!file) return;
+    if (!file || isProcessing) return;
 
-    const fileData = file.file as File;
-    const content = await fileData.text();
-    const rows = parseCSV(content);
+    setIsProcessing(true);
+    setParseErrors([]);
 
-    if (rows.length === 0) {
-      return;
+    try {
+      const fileData = file.file as File;
+
+      // Use streaming parser for better performance with large files
+      const result: ParseCSVResult = await parseCSVFile(fileData);
+
+      // Handle parsing errors
+      if (!result.success) {
+        setParseErrors(result.errors);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Check if we have any valid rows
+      if (result.rows.length === 0) {
+        setParseErrors(["No valid data rows found in the CSV file"]);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Success - proceed to preview
+      setRows(result.rows);
+      setFileName(fileData.name);
+      setStep(2);
+      router.push("/contacts/import/preview");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to parse CSV file";
+      setParseErrors([message]);
+    } finally {
+      setIsProcessing(false);
     }
+  }, [file, isProcessing, setRows, setFileName, setStep, router]);
 
-    setRows(rows);
-    setFileName(fileData.name);
-    setStep(2);
-    router.push("/contacts/import/preview");
-  }, [file, setRows, setFileName, setStep, router]);
+  // Clear parse errors when file changes
+  const handleRemoveFile = useCallback(
+    (id: string) => {
+      removeFile(id);
+      setParseErrors([]);
+    },
+    [removeFile]
+  );
 
   return (
     <div className="space-y-6">
@@ -79,18 +117,20 @@ export default function ImportUploadPage() {
 
       {/* Drop Zone */}
       <div
-        className={`flex min-h-48 flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors cursor-pointer ${
-          isDragging
-            ? "border-primary bg-primary/5"
+        className={`flex min-h-48 flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors ${
+          isProcessing
+            ? "border-border bg-muted/20 cursor-wait"
+            : isDragging
+            ? "border-primary bg-primary/5 cursor-pointer"
             : file
             ? "border-border bg-muted/20"
-            : "border-border/60 hover:border-border hover:bg-muted/20"
+            : "border-border/60 hover:border-border hover:bg-muted/20 cursor-pointer"
         }`}
-        onClick={!file ? openFileDialog : undefined}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
+        onClick={!file && !isProcessing ? openFileDialog : undefined}
+        onDragEnter={!isProcessing ? handleDragEnter : undefined}
+        onDragLeave={!isProcessing ? handleDragLeave : undefined}
+        onDragOver={!isProcessing ? handleDragOver : undefined}
+        onDrop={!isProcessing ? handleDrop : undefined}
         role="button"
         tabIndex={-1}
       >
@@ -98,7 +138,7 @@ export default function ImportUploadPage() {
           {...getInputProps()}
           aria-label="Upload CSV file"
           className="sr-only"
-          disabled={Boolean(file)}
+          disabled={Boolean(file) || isProcessing}
         />
 
         {!file ? (
@@ -133,8 +173,9 @@ export default function ImportUploadPage() {
                 className="shrink-0 text-muted-foreground hover:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  removeFile(file.id);
+                  handleRemoveFile(file.id);
                 }}
+                disabled={isProcessing}
               >
                 <XIcon className="h-4 w-4" />
               </Button>
@@ -144,13 +185,17 @@ export default function ImportUploadPage() {
       </div>
 
       {/* Errors */}
-      {errors.length > 0 && (
+      {allErrors.length > 0 && (
         <div
-          className="flex items-center gap-2 text-destructive text-sm"
+          className="flex flex-col gap-1 p-3 rounded-lg border border-destructive/30 bg-destructive/5"
           role="alert"
         >
-          <AlertCircleIcon className="h-4 w-4 shrink-0" />
-          <span>{errors[0]}</span>
+          {allErrors.map((error, i) => (
+            <div key={i} className="flex items-start gap-2 text-sm">
+              <AlertCircleIcon className="h-4 w-4 shrink-0 mt-0.5 text-destructive" />
+              <span className="text-destructive">{error}</span>
+            </div>
+          ))}
         </div>
       )}
 
@@ -158,11 +203,18 @@ export default function ImportUploadPage() {
       <div className="flex justify-end pt-4">
         <Button
           size="lg"
-          disabled={!file}
+          disabled={!file || isProcessing}
           onClick={handleContinue}
           className="min-w-32"
         >
-          Continue
+          {isProcessing ? (
+            <>
+              <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Continue"
+          )}
         </Button>
       </div>
     </div>
