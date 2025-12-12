@@ -139,10 +139,15 @@ export default function ContactsPage() {
                 Manage your contacts and track their review journey.
               </p>
             </div>
-            <Button onClick={handleAddContact} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Contact
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" asChild>
+                <a href="/contacts/import">Import</a>
+              </Button>
+              <Button onClick={handleAddContact} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Contact
+              </Button>
+            </div>
           </div>
 
           {/* Data Table */}
