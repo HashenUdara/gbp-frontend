@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table";
 
-import { Contact } from "./types";
+import { Contact, TimelineEventType } from "./types";
 import { sourceOptions } from "./data";
 
 // Generate a consistent subtle hue based on name for avatar
@@ -32,26 +32,48 @@ function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
-function getSourceBadgeVariant(
-  source: string
-): "default" | "secondary" | "outline" {
-  switch (source) {
-    case "manual":
-      return "default";
-    case "import":
-      return "secondary";
-    case "crm":
-      return "outline";
+// Status badge styles based on event type
+function getStatusBadgeStyle(eventType: TimelineEventType): string {
+  switch (eventType) {
+    case "review_completed":
+      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+    case "sms_delivered":
+    case "sms_opened":
+    case "link_clicked":
+      return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+    case "sms_sent":
+    case "reminder_sent":
+      return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20";
+    case "sms_failed":
+      return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
+    case "unsubscribed":
+      return "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20";
+    case "review_started":
+    case "qr_viewed":
+      return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
     default:
-      return "secondary";
+      return "bg-muted text-muted-foreground border-border";
   }
 }
+
+// Status filter options based on timeline event types
+export const statusFilterOptions = [
+  { value: "review_completed", label: "Reviewed" },
+  { value: "link_clicked", label: "Link Clicked" },
+  { value: "sms_sent", label: "SMS Sent" },
+  { value: "sms_delivered", label: "SMS Delivered" },
+  { value: "sms_failed", label: "SMS Failed" },
+  { value: "reminder_sent", label: "Reminder Sent" },
+  { value: "unsubscribed", label: "Unsubscribed" },
+  { value: "added", label: "New" },
+];
 
 export function getColumns(
   onEdit: (contact: Contact) => void,
   onDelete: (contact: Contact) => void
 ): ColumnDef<Contact>[] {
   return [
+    // 1. Name
     {
       id: "name",
       accessorFn: (row) => `${row.firstName} ${row.lastName}`,
@@ -88,6 +110,20 @@ export function getColumns(
       enableSorting: true,
       enableHiding: false,
     },
+    // 2. Phone
+    {
+      accessorKey: "telephone",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Phone" />
+      ),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">
+          {row.getValue("telephone")}
+        </span>
+      ),
+      enableSorting: false,
+    },
+    // 3. Email
     {
       accessorKey: "email",
       header: ({ column }) => (
@@ -111,86 +147,50 @@ export function getColumns(
       ),
       enableSorting: true,
     },
+    // 4. Status
     {
-      accessorKey: "telephone",
+      id: "status",
+      accessorFn: (row) => {
+        if (row.timeline.length === 0) return "added";
+        const sorted = [...row.timeline].sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+        return sorted[0].type;
+      },
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Phone" />
-      ),
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">
-          {row.getValue("telephone")}
-        </span>
-      ),
-      enableSorting: false,
-    },
-    {
-      accessorKey: "source",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Source" />
+        <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const source = row.getValue("source") as string;
-        const sourceOption = sourceOptions.find((s) => s.value === source);
-        const Icon = sourceOption?.icon;
+        const timeline = row.original.timeline;
+        if (timeline.length === 0) {
+          return (
+            <Badge
+              variant="outline"
+              className={`text-xs ${getStatusBadgeStyle("added")}`}
+            >
+              New
+            </Badge>
+          );
+        }
+        const sorted = [...timeline].sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+        const lastEvent = sorted[0];
+        const statusOption = statusFilterOptions.find(
+          (s) => s.value === lastEvent.type
+        );
 
         return (
-          <Badge variant={getSourceBadgeVariant(source)} className="gap-1">
-            {Icon && <Icon className="h-3 w-3" />}
-            {sourceOption?.label || source}
+          <Badge
+            variant="outline"
+            className={`text-xs ${getStatusBadgeStyle(lastEvent.type)}`}
+          >
+            {statusOption?.label || lastEvent.title}
           </Badge>
         );
       },
       filterFn: (row, id, value) => {
         return value.includes(row.getValue(id));
-      },
-      enableSorting: true,
-    },
-    {
-      accessorKey: "addedDate",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Added" />
-      ),
-      cell: ({ row }) => {
-        const date = row.getValue("addedDate") as Date;
-        return (
-          <span className="text-muted-foreground text-sm">
-            {format(date, "MMM d, yyyy")}
-          </span>
-        );
-      },
-      enableSorting: true,
-    },
-    {
-      id: "lastActivity",
-      accessorFn: (row) => {
-        if (row.timeline.length === 0) return null;
-        // Get most recent timeline event
-        const sorted = [...row.timeline].sort(
-          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-        );
-        return sorted[0];
-      },
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Activity" />
-      ),
-      cell: ({ row }) => {
-        const timeline = row.original.timeline;
-        if (timeline.length === 0) {
-          return <span className="text-muted-foreground text-sm">—</span>;
-        }
-        // Get most recent event
-        const sorted = [...timeline].sort(
-          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-        );
-        const lastEvent = sorted[0];
-        return (
-          <div className="flex flex-col">
-            <span className="text-sm">{lastEvent.title}</span>
-            <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(lastEvent.timestamp, { addSuffix: true })}
-            </span>
-          </div>
-        );
       },
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -207,6 +207,43 @@ export function getColumns(
         return aLatest - bLatest;
       },
     },
+    // 5. Source
+    {
+      accessorKey: "source",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Source" />
+      ),
+      cell: ({ row }) => {
+        const source = row.getValue("source") as string;
+        const sourceOption = sourceOptions.find((s) => s.value === source);
+        return (
+          <span className="text-muted-foreground text-sm">
+            {sourceOption?.label || source}
+          </span>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id));
+      },
+      enableSorting: true,
+    },
+    // 6. Added
+    {
+      accessorKey: "addedDate",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Added" />
+      ),
+      cell: ({ row }) => {
+        const date = row.getValue("addedDate") as Date;
+        return (
+          <span className="text-muted-foreground text-sm">
+            {format(date, "MMM d, yyyy")}
+          </span>
+        );
+      },
+      enableSorting: true,
+    },
+    // 7. Actions
     {
       id: "actions",
       cell: ({ row }) => {

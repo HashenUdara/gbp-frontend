@@ -17,23 +17,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-import { Contact, ContactSource } from "./types";
-import { sourceOptions } from "./data";
+import { Contact } from "./types";
 
 const contactSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   telephone: z.string().min(1, "Phone number is required"),
-  source: z.enum(["manual", "import", "crm"]),
   notes: z.string().optional(),
 });
 
@@ -46,7 +37,12 @@ interface ContactDialogProps {
   onSave: (
     contact: Omit<
       Contact,
-      "id" | "addedDate" | "timeline" | "reviewCount" | "lastActivity"
+      | "id"
+      | "addedDate"
+      | "timeline"
+      | "reviewCount"
+      | "lastActivity"
+      | "source"
     > & { id?: string }
   ) => void;
 }
@@ -66,7 +62,6 @@ export function ContactDialog({
       lastName: "",
       email: "",
       telephone: "",
-      source: "manual",
       notes: "",
     },
   });
@@ -80,7 +75,6 @@ export function ContactDialog({
           lastName: contact.lastName,
           email: contact.email,
           telephone: contact.telephone,
-          source: contact.source,
           notes: contact.notes || "",
         });
       } else {
@@ -89,7 +83,6 @@ export function ContactDialog({
           lastName: "",
           email: "",
           telephone: "",
-          source: "manual",
           notes: "",
         });
       }
@@ -173,29 +166,6 @@ export function ContactDialog({
                 {form.formState.errors.telephone.message}
               </p>
             )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="source">Source</Label>
-            <Select
-              value={form.watch("source")}
-              onValueChange={(value: ContactSource) =>
-                form.setValue("source", value)
-              }
-            >
-              <SelectTrigger id="source">
-                <SelectValue placeholder="Select source" />
-              </SelectTrigger>
-              <SelectContent>
-                {sourceOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center gap-2">
-                      <option.icon className="h-4 w-4" />
-                      {option.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>

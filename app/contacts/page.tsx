@@ -23,7 +23,7 @@ import { DataTable } from "@/components/data-table";
 
 import { Contact } from "./types";
 import { sampleContacts, sourceOptions } from "./data";
-import { getColumns } from "./columns";
+import { getColumns, statusFilterOptions } from "./columns";
 import { ContactDialog } from "./contact-dialog";
 import { ContactSheet } from "./contact-sheet";
 
@@ -67,23 +67,35 @@ export default function ContactsPage() {
   const handleSaveContact = (
     data: Omit<
       Contact,
-      "id" | "addedDate" | "timeline" | "reviewCount" | "lastActivity"
+      | "id"
+      | "addedDate"
+      | "timeline"
+      | "reviewCount"
+      | "lastActivity"
+      | "source"
     > & { id?: string }
   ) => {
     if (data.id) {
-      // Editing existing contact
+      // Editing existing contact - preserve source
       setContacts((prev) =>
         prev.map((c) =>
           c.id === data.id
-            ? { ...c, ...data, addedDate: c.addedDate, timeline: c.timeline }
+            ? {
+                ...c,
+                ...data,
+                addedDate: c.addedDate,
+                timeline: c.timeline,
+                source: c.source,
+              }
             : c
         )
       );
     } else {
-      // Adding new contact
+      // Adding new contact - auto-set source to 'manual'
       const newContact: Contact = {
         ...data,
         id: crypto.randomUUID(),
+        source: "manual",
         addedDate: new Date(),
         reviewCount: 0,
         timeline: [
@@ -166,6 +178,14 @@ export default function ContactsPage() {
                     label: s.label,
                     value: s.value,
                     icon: s.icon,
+                  })),
+                },
+                {
+                  column: "status",
+                  title: "Status",
+                  options: statusFilterOptions.map((s) => ({
+                    label: s.label,
+                    value: s.value,
                   })),
                 },
               ],
