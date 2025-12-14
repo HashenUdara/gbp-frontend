@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 import { Contact, TimelineEventType } from "./types";
-import { sourceOptions, statusOptions } from "./data";
+import { sourceOptions } from "./data";
 
 // Icon mapping for timeline events
 const timelineIcons: Record<
@@ -65,25 +65,6 @@ const eventColors: Record<TimelineEventType, string> = {
   reminder_sent: "text-foreground",
   unsubscribed: "text-muted-foreground",
 };
-
-function getStatusConfig(status: string) {
-  switch (status) {
-    case "active":
-      return {
-        dot: "bg-emerald-500",
-        text: "text-emerald-600 dark:text-emerald-400",
-      };
-    case "inactive":
-      return { dot: "bg-rose-500", text: "text-rose-600 dark:text-rose-400" };
-    case "pending":
-      return {
-        dot: "bg-amber-500",
-        text: "text-amber-600 dark:text-amber-400",
-      };
-    default:
-      return { dot: "bg-muted-foreground", text: "text-muted-foreground" };
-  }
-}
 
 // Generate avatar hue based on name
 function getAvatarHue(name: string): number {
@@ -119,8 +100,6 @@ export function ContactSheet({
   )}`.toUpperCase();
   const hue = getAvatarHue(fullName);
   const sourceOption = sourceOptions.find((s) => s.value === contact.source);
-  const statusOption = statusOptions.find((s) => s.value === contact.status);
-  const statusConfig = getStatusConfig(contact.status);
 
   // Sort timeline by date, most recent first
   const sortedTimeline = [...contact.timeline].sort(
@@ -297,6 +276,16 @@ export function ContactSheet({
                         })}
                       </span>
                     </div>
+                  </div>
+                )}
+
+                {/* Notes - spans full width */}
+                {contact.notes && (
+                  <div className="col-span-2 p-3 rounded-lg border border-border/60">
+                    <p className="text-[11px] text-muted-foreground mb-1">
+                      Notes
+                    </p>
+                    <p className="text-sm">{contact.notes}</p>
                   </div>
                 )}
               </div>

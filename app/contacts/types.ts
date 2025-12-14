@@ -1,6 +1,4 @@
-export type ContactSource = "manual" | "bulk_upload" | "crm_integration";
-
-export type ContactStatus = "active" | "inactive" | "pending";
+export type ContactSource = "manual" | "import" | "crm";
 
 export type TimelineEventType =
   | "added"
@@ -31,7 +29,7 @@ export interface Contact {
   email: string;
   telephone: string;
   source: ContactSource;
-  status: ContactStatus;
+  notes?: string;
   addedDate: Date;
   lastActivity?: Date;
   reviewCount: number;

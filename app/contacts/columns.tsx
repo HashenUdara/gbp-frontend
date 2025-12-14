@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table";
 
 import { Contact } from "./types";
-import { sourceOptions, statusOptions } from "./data";
+import { sourceOptions } from "./data";
 
 // Generate a consistent subtle hue based on name for avatar
 function getAvatarHue(name: string): number {
@@ -38,25 +38,12 @@ function getSourceBadgeVariant(
   switch (source) {
     case "manual":
       return "default";
-    case "bulk_upload":
+    case "import":
       return "secondary";
-    case "crm_integration":
+    case "crm":
       return "outline";
     default:
       return "secondary";
-  }
-}
-
-function getStatusStyles(status: string): string {
-  switch (status) {
-    case "active":
-      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
-    case "inactive":
-      return "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400";
-    case "pending":
-      return "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400";
-    default:
-      return "";
   }
 }
 
@@ -159,31 +146,6 @@ export function getColumns(
       enableSorting: true,
     },
     {
-      accessorKey: "status",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Status" />
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        const statusOption = statusOptions.find((s) => s.value === status);
-        const Icon = statusOption?.icon;
-
-        return (
-          <Badge
-            variant="outline"
-            className={`gap-1 ${getStatusStyles(status)}`}
-          >
-            {Icon && <Icon className="h-3 w-3" />}
-            {statusOption?.label || status}
-          </Badge>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id));
-      },
-      enableSorting: true,
-    },
-    {
       accessorKey: "addedDate",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Added" />
@@ -197,6 +159,53 @@ export function getColumns(
         );
       },
       enableSorting: true,
+    },
+    {
+      id: "lastActivity",
+      accessorFn: (row) => {
+        if (row.timeline.length === 0) return null;
+        // Get most recent timeline event
+        const sorted = [...row.timeline].sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+        return sorted[0];
+      },
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Activity" />
+      ),
+      cell: ({ row }) => {
+        const timeline = row.original.timeline;
+        if (timeline.length === 0) {
+          return <span className="text-muted-foreground text-sm">—</span>;
+        }
+        // Get most recent event
+        const sorted = [...timeline].sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+        const lastEvent = sorted[0];
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm">{lastEvent.title}</span>
+            <span className="text-xs text-muted-foreground">
+              {formatDistanceToNow(lastEvent.timestamp, { addSuffix: true })}
+            </span>
+          </div>
+        );
+      },
+      enableSorting: true,
+      sortingFn: (rowA, rowB) => {
+        const aTimeline = rowA.original.timeline;
+        const bTimeline = rowB.original.timeline;
+        const aLatest =
+          aTimeline.length > 0
+            ? Math.max(...aTimeline.map((t) => t.timestamp.getTime()))
+            : 0;
+        const bLatest =
+          bTimeline.length > 0
+            ? Math.max(...bTimeline.map((t) => t.timestamp.getTime()))
+            : 0;
+        return aLatest - bLatest;
+      },
     },
     {
       id: "actions",

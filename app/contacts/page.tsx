@@ -22,7 +22,7 @@ import {
 import { DataTable } from "@/components/data-table";
 
 import { Contact } from "./types";
-import { sampleContacts, sourceOptions, statusOptions } from "./data";
+import { sampleContacts, sourceOptions } from "./data";
 import { getColumns } from "./columns";
 import { ContactDialog } from "./contact-dialog";
 import { ContactSheet } from "./contact-sheet";
@@ -163,15 +163,6 @@ export default function ContactsPage() {
                   column: "source",
                   title: "Source",
                   options: sourceOptions.map((s) => ({
-                    label: s.label,
-                    value: s.value,
-                    icon: s.icon,
-                  })),
-                },
-                {
-                  column: "status",
-                  title: "Status",
-                  options: statusOptions.map((s) => ({
                     label: s.label,
                     value: s.value,
                     icon: s.icon,

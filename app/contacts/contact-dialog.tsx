@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -24,16 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Contact, ContactSource, ContactStatus } from "./types";
-import { sourceOptions, statusOptions } from "./data";
+import { Contact, ContactSource } from "./types";
+import { sourceOptions } from "./data";
 
 const contactSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   telephone: z.string().min(1, "Phone number is required"),
-  source: z.enum(["manual", "bulk_upload", "crm_integration"]),
-  status: z.enum(["active", "inactive", "pending"]),
+  source: z.enum(["manual", "import", "crm"]),
+  notes: z.string().optional(),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -43,7 +44,10 @@ interface ContactDialogProps {
   onOpenChange: (open: boolean) => void;
   contact?: Contact | null;
   onSave: (
-    contact: Omit<Contact, "id" | "addedDate"> & { id?: string }
+    contact: Omit<
+      Contact,
+      "id" | "addedDate" | "timeline" | "reviewCount" | "lastActivity"
+    > & { id?: string }
   ) => void;
 }
 
@@ -63,7 +67,7 @@ export function ContactDialog({
       email: "",
       telephone: "",
       source: "manual",
-      status: "active",
+      notes: "",
     },
   });
 
@@ -77,7 +81,7 @@ export function ContactDialog({
           email: contact.email,
           telephone: contact.telephone,
           source: contact.source,
-          status: contact.status,
+          notes: contact.notes || "",
         });
       } else {
         form.reset({
@@ -86,7 +90,7 @@ export function ContactDialog({
           email: "",
           telephone: "",
           source: "manual",
-          status: "active",
+          notes: "",
         });
       }
     }
@@ -170,53 +174,37 @@ export function ContactDialog({
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="source">Source</Label>
-              <Select
-                value={form.watch("source")}
-                onValueChange={(value: ContactSource) =>
-                  form.setValue("source", value)
-                }
-              >
-                <SelectTrigger id="source">
-                  <SelectValue placeholder="Select source" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sourceOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center gap-2">
-                        <option.icon className="h-4 w-4" />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={form.watch("status")}
-                onValueChange={(value: ContactStatus) =>
-                  form.setValue("status", value)
-                }
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center gap-2">
-                        <option.icon className="h-4 w-4" />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="source">Source</Label>
+            <Select
+              value={form.watch("source")}
+              onValueChange={(value: ContactSource) =>
+                form.setValue("source", value)
+              }
+            >
+              <SelectTrigger id="source">
+                <SelectValue placeholder="Select source" />
+              </SelectTrigger>
+              <SelectContent>
+                {sourceOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center gap-2">
+                      <option.icon className="h-4 w-4" />
+                      {option.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              placeholder="Add any notes about this contact..."
+              rows={3}
+              {...form.register("notes")}
+            />
           </div>
           <DialogFooter>
             <Button

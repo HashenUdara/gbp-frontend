@@ -1,17 +1,5 @@
-import {
-  UserPlus,
-  Upload,
-  Globe,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from "lucide-react";
-import {
-  Contact,
-  ContactSource,
-  ContactStatus,
-  TimelineEventType,
-} from "./types";
+import { UserPlus, Upload, Globe } from "lucide-react";
+import { Contact, ContactSource, TimelineEventType } from "./types";
 
 export const sourceOptions: {
   value: ContactSource;
@@ -19,18 +7,8 @@ export const sourceOptions: {
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
   { value: "manual", label: "Manual", icon: UserPlus },
-  { value: "bulk_upload", label: "Bulk Upload", icon: Upload },
-  { value: "crm_integration", label: "CRM Integration", icon: Globe },
-];
-
-export const statusOptions: {
-  value: ContactStatus;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-}[] = [
-  { value: "active", label: "Active", icon: CheckCircle },
-  { value: "inactive", label: "Inactive", icon: XCircle },
-  { value: "pending", label: "Pending", icon: Clock },
+  { value: "import", label: "Import", icon: Upload },
+  { value: "crm", label: "CRM", icon: Globe },
 ];
 
 // Event type config for timeline display
@@ -60,7 +38,7 @@ export const sampleContacts: Contact[] = [
     email: "sarah.johnson@example.com",
     telephone: "+1 (555) 123-4567",
     source: "manual",
-    status: "active",
+    notes: "VIP customer, prefers email communication",
     addedDate: new Date("2024-11-15"),
     lastActivity: new Date("2024-12-10"),
     reviewCount: 1,
@@ -109,8 +87,7 @@ export const sampleContacts: Contact[] = [
     lastName: "Chen",
     email: "m.chen@company.co",
     telephone: "+1 (555) 234-5678",
-    source: "crm_integration",
-    status: "active",
+    source: "crm",
     addedDate: new Date("2024-11-20"),
     lastActivity: new Date("2024-12-08"),
     reviewCount: 0,
@@ -158,8 +135,8 @@ export const sampleContacts: Contact[] = [
     lastName: "Rodriguez",
     email: "emily.r@startup.io",
     telephone: "+1 (555) 345-6789",
-    source: "bulk_upload",
-    status: "pending",
+    source: "import",
+    notes: "Imported from December campaign list",
     addedDate: new Date("2024-12-01"),
     reviewCount: 0,
     timeline: [
@@ -192,8 +169,7 @@ export const sampleContacts: Contact[] = [
     lastName: "Wilson",
     email: "jwilson@enterprise.com",
     telephone: "+1 (555) 456-7890",
-    source: "crm_integration",
-    status: "active",
+    source: "crm",
     addedDate: new Date("2024-12-05"),
     lastActivity: new Date("2024-12-11"),
     reviewCount: 1,
@@ -257,7 +233,7 @@ export const sampleContacts: Contact[] = [
     email: "olivia.brown@agency.net",
     telephone: "+1 (555) 567-8901",
     source: "manual",
-    status: "inactive",
+    notes: "Opted out of communications",
     addedDate: new Date("2024-10-28"),
     lastActivity: new Date("2024-11-05"),
     reviewCount: 0,
@@ -305,8 +281,7 @@ export const sampleContacts: Contact[] = [
     lastName: "Kim",
     email: "david.kim@tech.io",
     telephone: "+1 (555) 678-9012",
-    source: "bulk_upload",
-    status: "active",
+    source: "import",
     addedDate: new Date("2024-12-08"),
     lastActivity: new Date("2024-12-09"),
     reviewCount: 0,
