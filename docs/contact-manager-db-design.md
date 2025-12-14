@@ -1,6 +1,6 @@
 # Contact Manager Database Design
 
-Focused schema for the contacts table.
+Database schema for contacts with timeline tracking.
 
 ---
 
@@ -9,6 +9,7 @@ Focused schema for the contacts table.
 ```mermaid
 erDiagram
     users ||--o{ contacts : "has many"
+    contacts ||--o{ contact_timeline : "has many"
     google_business_profile_locations ||--o{ contacts : "linked to"
 
     users {
@@ -30,47 +31,75 @@ erDiagram
         timestamp added_date
     }
 
-    google_business_profile_locations {
+    contact_timeline {
         uuid id PK
-        varchar name
-        varchar location_id
+        uuid contact_id FK
+        varchar event_type
+        varchar title
+        text description
+        jsonb metadata
+        timestamp created_at
     }
 ```
 
 ---
 
-## Contacts Table
+## Tables
 
-| Column        | Type         | Constraints                 | Description                   |
-| ------------- | ------------ | --------------------------- | ----------------------------- |
-| id            | uuid         | PK, default random          | Unique identifier             |
-| user_id       | uuid         | FK → users.id, NOT NULL     | Owner of the contact          |
-| location_id   | uuid         | FK → gbp_locations.id, NULL | Linked business location      |
-| first_name    | varchar(255) | NOT NULL                    | First name                    |
-| last_name     | varchar(255) | NULL                        | Last name                     |
-| email         | varchar(255) | NOT NULL                    | Email address                 |
-| telephone     | varchar(50)  | NULL                        | Phone number                  |
-| source        | varchar(50)  | NOT NULL, default 'manual'  | 'manual' \| 'import' \| 'crm' |
-| notes         | text         | NULL                        | Free-form notes about contact |
-| added_date    | timestamp    | NOT NULL, default now()     | When contact was added        |
-| created_by    | varchar(255) | NULL                        | Audit field                   |
-| created_date  | timestamp    | default now()               | Audit field                   |
-| modified_by   | varchar(255) | NULL                        | Audit field                   |
-| modified_date | timestamp    | NULL                        | Audit field                   |
+### `contacts`
 
-**Indexes:**
+| Column      | Type         | Constraints             | Description                   |
+| ----------- | ------------ | ----------------------- | ----------------------------- |
+| id          | uuid         | PK                      | Unique identifier             |
+| user_id     | uuid         | FK → users.id, NOT NULL | Owner                         |
+| location_id | uuid         | FK → gbp_locations.id   | Linked business               |
+| first_name  | varchar(255) | NOT NULL                |                               |
+| last_name   | varchar(255) |                         |                               |
+| email       | varchar(255) | NOT NULL                |                               |
+| telephone   | varchar(50)  |                         |                               |
+| source      | varchar(50)  | NOT NULL                | `manual` \| `import` \| `crm` |
+| notes       | text         |                         | Free-form notes               |
+| added_date  | timestamp    | NOT NULL                | When added                    |
 
-- `idx_contacts_user_id` on (user_id)
-- `idx_contacts_user_email` on (user_id, email) UNIQUE
+---
+
+### `contact_timeline`
+
+| Column      | Type         | Constraints                | Description            |
+| ----------- | ------------ | -------------------------- | ---------------------- |
+| id          | uuid         | PK                         | Unique identifier      |
+| contact_id  | uuid         | FK → contacts.id, NOT NULL | Parent contact         |
+| event_type  | varchar(50)  | NOT NULL                   | Event code (see below) |
+| title       | varchar(255) | NOT NULL                   | Display title          |
+| description | text         |                            | Event details          |
+| metadata    | jsonb        |                            | Additional data        |
+| created_at  | timestamp    | NOT NULL                   | When occurred          |
+
+**Event Types:**
+| Type | Description |
+|------|-------------|
+| `added` | Contact created |
+| `sms_sent` | Review request sent |
+| `sms_delivered` | SMS delivered |
+| `sms_failed` | Delivery failed |
+| `link_clicked` | Review link opened |
+| `review_completed` | Review submitted |
+| `reminder_sent` | Follow-up sent |
+| `unsubscribed` | Opted out |
 
 ---
 
 ## Drizzle Schema
 
 ```typescript
-import { pgTable, uuid, varchar, timestamp, text } from "drizzle-orm/pg-core";
-import { users } from "./schema";
-import { googleBusinessProfileLocations } from "./schema";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  text,
+  jsonb,
+} from "drizzle-orm/pg-core";
 
 export const contacts = pgTable("contacts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -93,17 +122,20 @@ export const contacts = pgTable("contacts", {
   modifiedDate: timestamp("modified_date"),
 });
 
-// Type exports
+export const contactTimeline = pgTable("contact_timeline", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  contactId: uuid("contact_id")
+    .references(() => contacts.id)
+    .notNull(),
+  eventType: varchar("event_type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Types
 export type Contact = typeof contacts.$inferSelect;
 export type NewContact = typeof contacts.$inferInsert;
+export type ContactTimelineEvent = typeof contactTimeline.$inferSelect;
 ```
-
----
-
-## Source Values
-
-| Value    | Description                 |
-| -------- | --------------------------- |
-| `manual` | Added individually via UI   |
-| `import` | Bulk imported from CSV      |
-| `crm`    | Synced from CRM integration |
