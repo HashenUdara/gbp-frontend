@@ -1,0 +1,195 @@
+"use client";
+
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+import { Contact } from "./types";
+
+const contactSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  telephone: z.string().min(1, "Phone number is required"),
+  notes: z.string().optional(),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
+
+interface ContactDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  contact?: Contact | null;
+  onSave: (
+    contact: Omit<
+      Contact,
+      | "id"
+      | "addedDate"
+      | "timeline"
+      | "reviewCount"
+      | "lastActivity"
+      | "source"
+    > & { id?: string }
+  ) => void;
+}
+
+export function ContactDialog({
+  open,
+  onOpenChange,
+  contact,
+  onSave,
+}: ContactDialogProps) {
+  const isEditing = !!contact;
+
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      telephone: "",
+      notes: "",
+    },
+  });
+
+  // Reset form when dialog opens with contact data
+  React.useEffect(() => {
+    if (open) {
+      if (contact) {
+        form.reset({
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          email: contact.email,
+          telephone: contact.telephone,
+          notes: contact.notes || "",
+        });
+      } else {
+        form.reset({
+          firstName: "",
+          lastName: "",
+          email: "",
+          telephone: "",
+          notes: "",
+        });
+      }
+    }
+  }, [open, contact, form]);
+
+  const onSubmit = (data: ContactFormData) => {
+    onSave({
+      ...data,
+      id: contact?.id,
+    });
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? "Edit Contact" : "Add New Contact"}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? "Update the contact details below."
+              : "Fill in the details to add a new contact."}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                placeholder="John"
+                {...form.register("firstName")}
+              />
+              {form.formState.errors.firstName && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.firstName.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                placeholder="Doe"
+                {...form.register("lastName")}
+              />
+              {form.formState.errors.lastName && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.lastName.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="john.doe@example.com"
+              {...form.register("email")}
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.email.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="telephone">Phone Number</Label>
+            <Input
+              id="telephone"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              {...form.register("telephone")}
+            />
+            {form.formState.errors.telephone && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.telephone.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              placeholder="Add any notes about this contact..."
+              rows={3}
+              {...form.register("notes")}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">
+              {isEditing ? "Save Changes" : "Add Contact"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
